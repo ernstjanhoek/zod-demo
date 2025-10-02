@@ -1,13 +1,25 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Error, PetService } from '../services/pet.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, of } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
 })
 export class AppComponent {
   title = 'zod-test';
+  petService = inject(PetService);
+
+  somePet = toSignal(this.petService.loadPets().pipe(catchError((error: HttpErrorResponse) => {
+    console.log('httpErrorResponse', error);
+    return of();
+  })));
+
+  someOtherPet = toSignal(this.petService.loadPets().pipe(catchError((error: Error) => {
+    console.log('error met eigen errorType', error);
+    return of();
+  })));
 }
