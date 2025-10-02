@@ -26,7 +26,7 @@ describe('PetService', () => {
       done();
     });
 
-    const req = httpMock.expectOne('/pet/custom');
+    const req = httpMock.expectOne('http://localhost:3000/pet/custom');
     expect(req.request.method).toBe('GET');
 
     // Respond with valid data
@@ -42,7 +42,7 @@ describe('PetService', () => {
       },
     });
 
-    const req = httpMock.expectOne('/pet/custom');
+    const req = httpMock.expectOne('http://localhost:3000/pet/custom');
     // Respond with invalid data
     req.flush({ wrongField: 'oops' });
   });

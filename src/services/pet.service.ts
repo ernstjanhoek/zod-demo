@@ -28,13 +28,9 @@ export const get_GetPetCustom = {
 
 @Injectable({ providedIn: "root" })
 export class PetService {
-  // inject HttpClient directly into the field
-  private http = inject(HttpClient);
-
-  // build client immediately using the injected HttpClient
   client = buildClient(
     { getCustomPets: get_GetPetCustom },
-    this.http
+    inject(HttpClient)
   );
 
   loadPets() {

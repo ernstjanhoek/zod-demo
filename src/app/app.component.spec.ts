@@ -1,10 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { HttpTestingController } from '@angular/common/http/testing';
+import { PetService } from '../services/pet.service';
+import { of } from 'rxjs';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
+      providers: [
+        { provide:PetService, useValue: {
+          loadPets: () => of()
+        }}
+      ]
     }).compileComponents();
   });
 
@@ -24,6 +32,6 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, zod-test');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, zod test');
   });
 });
