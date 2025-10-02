@@ -28,12 +28,10 @@ export const get_GetPetCustom = {
 
 @Injectable({ providedIn: "root" })
 export class PetService {
-  client = buildClient(
-    { getCustomPets: get_GetPetCustom },
+   private client = buildClient(
+    { loadPets: get_GetPetCustom },
     inject(HttpClient)
   );
 
-  loadPets() {
-    return this.client.getCustomPets(); // Observable<{ id: number, name: string }>
-  }
+  public loadPets = this.client.loadPets;
 }
