@@ -13,12 +13,12 @@ export class AppComponent {
   title = 'zod-test';
   petService = inject(PetService);
 
-  somePet = toSignal(this.petService.loadPets().pipe(catchError((error: HttpErrorResponse) => {
+  somePet = toSignal(this.petService.loadPets({path: 'huisdierIdx' }).pipe(catchError((error: HttpErrorResponse) => {
     console.log('httpErrorResponse', error);
     return of();
   })));
 
-  someOtherPet = toSignal(this.petService.loadPets().pipe(catchError((error: Error) => {
+  someOtherPet = toSignal(this.petService.loadPets({ path: 'huisdierIdx2' }).pipe(catchError((error: Error) => {
     console.log('error met eigen errorType', error);
     return of();
   })));

@@ -19,12 +19,14 @@ export const get_GetPetCustom = {
   method: z.literal("GET"),
   path: z.literal("http://localhost:3000/pet/custom"),
   requestFormat: z.literal("json"),
-  parameters: z.never(),
+  parameters: z.object({
+    path: z.string(),
+  }),
   responses: z.object({
     "200": Pet,
     "400": Error
   }),
-};
+} as const;
 
 @Injectable({ providedIn: "root" })
 export class PetService {

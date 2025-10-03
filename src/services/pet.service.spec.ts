@@ -21,7 +21,9 @@ describe('PetService', () => {
   });
 
   it('should fetch and validate pets', (done) => {
-    service.loadPets().subscribe((pet) => {
+    service.loadPets({
+      path: 'huisdier'
+     }).subscribe((pet) => {
       expect(pet).toEqual({ id: 1, name: 'Fido' });
       done();
     });
@@ -34,7 +36,9 @@ describe('PetService', () => {
   });
 
   it('should throw if response is invalid', (done) => {
-    service.loadPets().subscribe({
+    service.loadPets({
+      path: 'huisdiertje'
+    }).subscribe({
       next: () => fail('Expected validation error'),
       error: (err) => {
         expect(err).toBeInstanceOf(Error); // Zod validation error
