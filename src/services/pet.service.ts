@@ -28,10 +28,10 @@ export const get_GetPetCustom = {
 
 @Injectable({ providedIn: "root" })
 export class PetService {
-   private client = buildClient(
+  private client = buildClient(
+    inject(HttpClient),
     { loadPets: get_GetPetCustom },
-    inject(HttpClient)
   );
 
-  public loadPets = this.client.loadPets;
+  public loadPets = this.client.loadPets; //expose alleen de methodes uit de client voor readability
 }

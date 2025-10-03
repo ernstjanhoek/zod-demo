@@ -22,8 +22,8 @@ type ResponseType<E extends EndpointDef> =
     : unknown;
     
 export function buildClient<T extends EndpointMap>(
+  http: HttpClient,
   endpoints: T,
-  http: HttpClient
 ) {
   const client: any = {};
 
