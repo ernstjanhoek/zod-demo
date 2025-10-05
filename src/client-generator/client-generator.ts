@@ -30,7 +30,6 @@ type InferParameters<T> =
     : never
   : never;
 
-
 type Client<TEndpoints extends EndpointMap> = {
   [K in keyof TEndpoints]:
     InferParameters<TEndpoints[K]> extends never
@@ -44,20 +43,23 @@ export function buildClient<T extends EndpointMap>(
 ) {
   const client: Partial<Client<T>> = {};
   for (const [name, ep] of Object.entries(endpoints)) {
-    const path = literalValue(ep.path);
-   
-    const method = literalValue(ep.method).toLowerCase();
-
-    const responses = ep.responses.shape;
-    const successKey = Object.keys(responses).find((s) => s.startsWith('2'));
-    const schema: ZodTypeAny = successKey ? responses[successKey] : responses;
-
     (client as any)[name] = (parameters: any): Observable<any> => {
-/*       const $request = http.request(method, path, {
-        body: parameters.body
-      }); */
-      const req$ = 
-      (http as any)[method](path);
+      const method = literalValue(ep.method).toLowerCase();
+      
+      const path = literalValue(ep.path);
+
+      const body = parameters && 'body' in parameters ? parameters.body : undefined;
+
+      const responses = ep.responses.shape;
+      const successKey = Object.keys(responses).find((s) => s.startsWith('2'));
+      const schema: ZodTypeAny = successKey ? responses[successKey] : responses;
+
+      const req$ = http.request(method, path, {
+        body: body,
+        params: parameters?.query,
+        headers: parameters?.header,
+      });
+
       return schema
         ? req$.pipe(map((res: any) => schema.parse(res)))
         : req$;
