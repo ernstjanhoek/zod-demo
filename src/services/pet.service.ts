@@ -44,7 +44,7 @@ export const post_PostPetCustom = {
 
 @Injectable({ providedIn: "root" })
 export class PetService {
-  private client = buildClient(
+  readonly #client = buildClient(
     inject(HttpClient),
     { 
       loadPets: get_GetPetCustom,
@@ -53,11 +53,11 @@ export class PetService {
   );
 
   public loadPets(): Observable<Pet> {
-    return this.client.loadPets(); // expose alleen de methodes uit de client voor readability
+    return this.#client.loadPets(); // expose alleen de methodes uit de client voor readability
   } 
 
   public editPet(pet: Pet): Observable<Pet> {
-    return this.client.editPet({
+    return this.#client.editPet({
       path: { id: pet.id },
       body: pet
     });
