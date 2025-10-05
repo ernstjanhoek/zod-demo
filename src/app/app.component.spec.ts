@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { HttpTestingController } from '@angular/common/http/testing';
 import { PetService } from '../services/pet.service';
 import { of } from 'rxjs';
 

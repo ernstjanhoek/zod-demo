@@ -1,20 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { z, ZodNever, ZodObject } from 'zod';
+import { z, ZodLiteral, ZodNever, ZodObject, ZodTypeAny } from 'zod';
 
 type EndpointDef = {
   method: z.ZodLiteral<string>;
   path: z.ZodLiteral<string>;
   requestFormat: z.ZodLiteral<string>;
-  parameters: z.AnyZodObject | z.ZodNever;
+  parameters?: z.AnyZodObject;
   responses: z.AnyZodObject;
 };
 
 type EndpointMap = Record<string, EndpointDef>;
 
-type SuccessKeys<R extends z.AnyZodObject> = Extract<keyof R['shape'], `${number}`> extends infer K
-  ? K extends `2${string}` ? K : never
-  : never;
+type SuccessKeys<R extends z.AnyZodObject> = Extract<
+  keyof R['shape'],
+  `2${string}`
+>;
 
 type ResponseType<E extends EndpointDef> =
   E['responses'] extends z.AnyZodObject
@@ -32,7 +33,9 @@ type InferParameters<T> =
 
 type Client<TEndpoints extends EndpointMap> = {
   [K in keyof TEndpoints]:
-    (params: InferParameters<TEndpoints[K]>) => Observable<ResponseType<TEndpoints[K]>>;
+    InferParameters<TEndpoints[K]> extends never
+      ? () => Observable<ResponseType<TEndpoints[K]>>
+      : (params: InferParameters<TEndpoints[K]>) => Observable<ResponseType<TEndpoints[K]>>;
 };
 
 export function buildClient<T extends EndpointMap>(
@@ -41,20 +44,29 @@ export function buildClient<T extends EndpointMap>(
 ) {
   const client: Partial<Client<T>> = {};
   for (const [name, ep] of Object.entries(endpoints)) {
-    const path = (ep.path as any)._def.value as string;
-    const method = (ep.method as any)._def.value.toLowerCase();
+    const path = literalValue(ep.path);
+   
+    const method = literalValue(ep.method).toLowerCase();
 
     const responses = ep.responses.shape;
     const successKey = Object.keys(responses).find((s) => s.startsWith('2'));
-    const schema = successKey ? responses[successKey] : undefined;
+    const schema: ZodTypeAny = successKey ? responses[successKey] : responses;
 
-    (client as any)[name] = (): Observable<any> => {
-      const req$ = (http as any)[method](path);
+    (client as any)[name] = (parameters: any): Observable<any> => {
+/*       const $request = http.request(method, path, {
+        body: parameters.body
+      }); */
+      const req$ = 
+      (http as any)[method](path);
       return schema
-        ? req$.pipe(map((res: any) => (schema as z.ZodTypeAny).parse(res)))
+        ? req$.pipe(map((res: any) => schema.parse(res)))
         : req$;
     };
   }
 
   return client as Client<T>;
+}
+
+function literalValue<TValue>(lit: ZodLiteral<TValue>): TValue {
+  return lit._def.value;
 }

@@ -19,8 +19,21 @@ export const get_GetPetCustom = {
   method: z.literal("GET"),
   path: z.literal("http://localhost:3000/pet/custom"),
   requestFormat: z.literal("json"),
+  responses: z.object({
+    "200": Pet,
+    "400": Error
+  }),
+} as const;
+
+export const post_PostPetCustom = {
+  method: z.literal("PUT"),
+  path: z.literal("http://localhost:3000/pet/custom/{id}"),
+  requestFormat: z.literal("json"),
   parameters: z.object({
-    path: z.string(),
+    body: Pet,        // the request body
+    path: z.object({     // optional path parameters if needed
+      id: z.number()
+    }),
   }),
   responses: z.object({
     "200": Pet,
@@ -32,8 +45,12 @@ export const get_GetPetCustom = {
 export class PetService {
   private client = buildClient(
     inject(HttpClient),
-    { loadPets: get_GetPetCustom },
+    { 
+      loadPets: get_GetPetCustom,
+      editPet: post_PostPetCustom,
+     },
   );
 
-  public loadPets = this.client.loadPets; //expose alleen de methodes uit de client voor readability
+  public loadPets = this.client.loadPets; // expose alleen de methodes uit de client voor readability
+  public editPet = this.client.editPet;
 }
