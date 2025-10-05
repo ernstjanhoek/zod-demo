@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { PetService } from './pet.service';
+import { Pet, PetService } from './pet.service';
 
 describe('PetService', () => {
   let service: PetService;
@@ -50,14 +50,16 @@ describe('PetService', () => {
   });
 
   it('should edit a pet successfully', (done) => {
+    const pet: Pet = { id: 1, name: 'Fluffy' };
+    
     const params = {
       path: { id: 1},
-      body: { id: 1, name: 'Fluffy' },
+      body: pet,
     };
 
-    const expectedResponse = { id: 1, name: 'Fluffy' };
+    const expectedResponse = pet;
 
-    service.editPet(params).subscribe((res) => {
+    service.editPet(pet).subscribe((res) => {
       expect(res).toEqual(expectedResponse);
       done();
     });
@@ -70,12 +72,9 @@ describe('PetService', () => {
   });
 
   it('should throw if the response is invalid', (done) => {
-    const params = {
-      path: { id: 1 },
-      body: { id: 1, name: 'Fluffy' },
-    };
+    const pet: Pet = { id: 1, name: 'Fluffy' };
 
-    service.editPet(params).subscribe({
+    service.editPet(pet).subscribe({
       next: () => fail('Expected validation error'),
       error: (err) => {
         // Zod will throw a validation error if the response does not match schema

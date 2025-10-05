@@ -2,6 +2,7 @@ import { inject, Injectable } from "@angular/core";
 import { buildClient } from "../client-generator/client-generator";
 import z from "zod";
 import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
 
 // --- your zod schemas ---
 export const Pet = z.object({
@@ -51,6 +52,14 @@ export class PetService {
      },
   );
 
-  public loadPets = this.client.loadPets; // expose alleen de methodes uit de client voor readability
-  public editPet = this.client.editPet;
+  public loadPets(): Observable<Pet> {
+    return this.client.loadPets(); // expose alleen de methodes uit de client voor readability
+  } 
+
+  public editPet(pet: Pet): Observable<Pet> {
+    return this.client.editPet({
+      path: { id: pet.id },
+      body: pet
+    });
+  }
 }
